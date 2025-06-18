@@ -4,17 +4,15 @@ pipeline {
     environment {
         IMAGE_NAME = 'proyecto:latest'
         IMAGE_TAR = 'imagen.tar'
-        IMPORT_SCRIPT = '/usr/local/bin/importar_imagen_k3s.sh'
     }
 
-    stage('Importar imagen en k3s') {
-    steps {
-        echo '📦 Importando imagen en k3s...'
-        // Esta es la línea que debes usar
-        sh "ssh root@localhost 'k3s ctr images import /root/imagen.tar'"
-    }
-}
-
+    stages {
+        stage('Preparar entorno') {
+            steps {
+                echo '🧹 Preparando entorno...'
+                sh 'ls -la'
+            }
+        }
 
         stage('Construir imagen Docker') {
             steps {
@@ -27,21 +25,23 @@ pipeline {
             steps {
                 echo '📦 Exportando imagen...'
                 sh "docker save ${IMAGE_NAME} -o ${IMAGE_TAR}"
+                // Copiarla al host si Jenkins no está en el mismo sistema
+                sh "scp ${IMAGE_TAR} root@localhost:/root/${IMAGE_TAR}"
             }
         }
 
         stage('Importar imagen en k3s') {
             steps {
                 echo '📦 Importando imagen en k3s...'
-                sh "${IMPORT_SCRIPT}"
+                sh "ssh root@localhost 'k3s ctr images import /root/${IMAGE_TAR}'"
             }
         }
 
         stage('Desplegar en Kubernetes') {
             steps {
                 echo '🚀 Desplegando en Kubernetes...'
-                sh 'kubectl apply -f k8s/deployment.yaml'
-                sh 'kubectl apply -f k8s/service.yaml'
+                sh "ssh root@localhost 'kubectl apply -f /root/PokeAPI/k8s/deployment.yaml'"
+                sh "ssh root@localhost 'kubectl apply -f /root/PokeAPI/k8s/service.yaml'"
             }
         }
     }
