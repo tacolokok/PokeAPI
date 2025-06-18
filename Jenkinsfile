@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs "node-js"  // ← Este nombre debe coincidir con el de la configuración en Jenkins
+        nodejs "node-js"  // ← Asegúrate de que coincide con el nombre en Jenkins
     }
 
     stages {
@@ -27,26 +27,21 @@ pipeline {
             }
         }
 
+        stage('Deploy') {
+            steps {
+                echo '🚀 Desplegando en Kubernetes...'
+                sh '''
+                    kubectl delete configmap pokeapp-static --ignore-not-found
+                    kubectl create configmap pokeapp-static --from-file=build --dry-run=client -o yaml | kubectl apply -f -
+                    kubectl apply -f k8s/deployment.yaml
+                '''
+            }
+        }
+
         stage('Finalizado') {
             steps {
                 echo '🎉 Pipeline completado correctamente.'
             }
         }
-
-            }
-}
-stage('Deploy') {
-    steps {
-        echo '🚀 Desplegando en Kubernetes...'
-        sh '''
-            # Copiamos la build al contenedor (si hiciera falta empaquetar, podrías usar Docker)
-            # Creamos un configmap con los archivos estáticos
-            kubectl delete configmap pokeapp-static --ignore-not-found
-            kubectl create configmap pokeapp-static --from-file=build --dry-run=client -o yaml | kubectl apply -f -
-
-            # Aplicamos el manifiesto del deployment
-            kubectl apply -f k8s/deployment.yaml
-        '''
     }
 }
-
