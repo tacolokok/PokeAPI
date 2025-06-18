@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'proyecto:latest'
-        IMAGE_TAR = 'imagen.tar'
+        REMOTE_HOST = "62.171.152.253"
+        REMOTE_USER = "root"
+        SSH_KEY = "/var/jenkins_home/.ssh/id_rsa"
     }
 
     stages {
@@ -17,37 +18,36 @@ pipeline {
         stage('Construir imagen Docker') {
             steps {
                 echo '🐳 Construyendo imagen Docker...'
-                sh "docker build -t ${IMAGE_NAME} ."
+                sh 'docker build -t proyecto:latest .'
             }
         }
 
         stage('Exportar imagen') {
             steps {
                 echo '📦 Exportando imagen...'
-                sh "docker save ${IMAGE_NAME} -o ${IMAGE_TAR}"
+                sh 'docker save proyecto:latest -o imagen.tar'
             }
         }
 
         stage('Importar en K3s') {
             steps {
-                echo '📦 Importando imagen a K3s mediante SSH...'
-                sh 'ssh root@localhost "/usr/local/bin/k3s ctr images import /root/PokeAPI/imagen.tar"'
+                echo '📦 Enviando imagen por SCP...'
+                sh 'scp -i ${SSH_KEY} -o StrictHostKeyChecking=no imagen.tar ${REMOTE_USER}@${REMOTE_HOST}:/root/imagen.tar'
+
+                echo '📦 Importando imagen a K3s vía SSH...'
+                sh 'ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "k3s ctr images import /root/imagen.tar"'
             }
         }
 
         stage('Desplegar en Kubernetes') {
             steps {
-                echo '🚀 Desplegando en Kubernetes...'
-                sh 'ssh root@localhost "kubectl apply -f /root/PokeAPI/k8s/deployment.yaml"'
-                sh 'ssh root@localhost "kubectl apply -f /root/PokeAPI/k8s/service.yaml"'
+                echo '🚀 Desplegando aplicación...'
+                sh 'ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "kubectl apply -f /root/PokeAPI/k8s/deployment.yaml"'
             }
         }
     }
 
     post {
-        success {
-            echo '✅ Despliegue completado correctamente.'
-        }
         failure {
             echo '💥 Algo falló en el pipeline.'
         }
