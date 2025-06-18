@@ -32,10 +32,12 @@ pipeline {
         stage('Importar en K3s') {
             steps {
                 echo '📦 Enviando imagen por SCP...'
-                sh 'scp -i ${SSH_KEY} -o StrictHostKeyChecking=no imagen.tar ${REMOTE_USER}@${REMOTE_HOST}:/root/imagen.tar'
+                sh 'scp -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no imagen.tar root@62.171.152.253:/tmp/imagen.tar'
+
 
                 echo '📦 Importando imagen a K3s vía SSH...'
-                sh 'ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "k3s ctr images import /root/imagen.tar"'
+                sh 'ssh -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no root@62.171.152.253 "k3s ctr images import /tmp/imagen.tar"'
+
             }
         }
 
