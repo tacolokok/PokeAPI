@@ -1,45 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pokeapp-deployment
-  labels:
-    app: pokeapp
+  name: proyecto
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: pokeapp
+      app: proyecto
   template:
     metadata:
       labels:
-        app: pokeapp
+        app: proyecto
     spec:
       containers:
-        - name: pokeapp
-          image: nginx:latest
+        - name: proyecto
+          image: proyecto:latest
           ports:
             - containerPort: 80
-          volumeMounts:
-            - name: pokeapp-static
-              mountPath: /usr/share/nginx/html
-              readOnly: true
-      volumes:
-        - name: pokeapp-static
-          configMap:
-            name: pokeapp-static
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pokeapp-service
-  labels:
-    app: pokeapp
-spec:
-  type: NodePort  # Puedes cambiar a LoadBalancer si tu cluster lo soporta
-  selector:
-    app: pokeapp
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-      nodePort: 30080  # Asegúrate de que este puerto está permitido por K3s
