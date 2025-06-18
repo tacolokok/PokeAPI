@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs "nodejs-lts"
+        nodejs "node-js"  // ← Este nombre debe coincidir con el de la configuración en Jenkins
     }
 
     stages {
