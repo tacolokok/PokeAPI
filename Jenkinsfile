@@ -2,27 +2,31 @@ pipeline {
     agent any
 
     tools {
-        nodejs "node-js"  // ← Asegúrate de que coincide con el nombre en Jenkins
+        nodejs "node-js"  // ← Asegúrate de que este nombre coincide en Jenkins
     }
 
     stages {
         stage('Preparar entorno') {
             steps {
-                echo 'Instalando dependencias...'
-                sh 'npm install'
+                echo '🧹 Limpiando y preparando dependencias...'
+                sh '''
+                    rm -rf node_modules package-lock.json
+                    npm cache clean --force
+                    npm install || npm install --force
+                '''
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Ejecutando pruebas...'
+                echo '🧪 Ejecutando pruebas...'
                 sh 'npm test || echo "Sin tests definidos o fallaron (ignorado por ahora)"'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Compilando la app...'
+                echo '🏗️ Compilando la app...'
                 sh 'npm run build'
             }
         }
