@@ -25,23 +25,21 @@ pipeline {
             steps {
                 echo '📦 Exportando imagen...'
                 sh "docker save ${IMAGE_NAME} -o ${IMAGE_TAR}"
-                // Copiarla al host si Jenkins no está en el mismo sistema
-                sh "scp ${IMAGE_TAR} root@localhost:/root/${IMAGE_TAR}"
             }
         }
 
-        stage('Importar imagen en k3s') {
+        stage('Importar en K3s') {
             steps {
-                echo '📦 Importando imagen en k3s...'
-                sh "ssh root@localhost 'k3s ctr images import /root/${IMAGE_TAR}'"
+                echo '📦 Importando imagen a K3s directamente (sin SSH)...'
+                sh "k3s ctr images import ${IMAGE_TAR}"
             }
         }
 
         stage('Desplegar en Kubernetes') {
             steps {
-                echo '🚀 Desplegando en Kubernetes...'
-                sh "ssh root@localhost 'kubectl apply -f /root/PokeAPI/k8s/deployment.yaml'"
-                sh "ssh root@localhost 'kubectl apply -f /root/PokeAPI/k8s/service.yaml'"
+                echo '🚀 Aplicando manifiestos...'
+                sh 'kubectl apply -f k8s/deployment.yaml'
+                sh 'kubectl apply -f k8s/service.yaml'
             }
         }
     }
