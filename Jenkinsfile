@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'proyecto:latest'
-        TAR_FILE = 'imagen.tar'
+        IMAGE_NAME = 'proyecto:latest'
+        IMAGE_TAR = 'imagen.tar'
+        K3S_PATH = '/usr/local/bin/k3s'  // Asegúrate que es la ruta correcta con `which k3s`
     }
 
     stages {
@@ -17,32 +18,36 @@ pipeline {
         stage('Construir imagen Docker') {
             steps {
                 echo '🐳 Construyendo imagen Docker...'
-                sh "docker build -t ${DOCKER_IMAGE} ."
+                sh "docker build -t ${IMAGE_NAME} ."
             }
         }
 
-        stage('Exportar imagen a TAR') {
+        stage('Exportar imagen') {
             steps {
-                echo '📦 Exportando imagen a archivo TAR...'
-                sh "docker save ${DOCKER_IMAGE} -o ${TAR_FILE}"
+                echo '📦 Exportando imagen...'
+                sh "docker save ${IMAGE_NAME} -o ${IMAGE_TAR}"
             }
         }
 
-        // No ejecutamos k3s ctr images import porque no está disponible en Jenkins
-        // Lo haces tú desde el host manualmente
-
-        stage('Aviso') {
+        stage('Importar imagen en k3s') {
             steps {
-                echo '⚠️  IMPORTANTE: Ejecuta manualmente desde el host:'
-                echo '    k3s ctr images import /ruta/al/imagen.tar'
-                echo '    kubectl rollout restart deployment proyecto'
+                echo '📦 Importando imagen en k3s...'
+                sh "${K3S_PATH} ctr images import ${IMAGE_TAR}"
+            }
+        }
+
+        stage('Desplegar en Kubernetes') {
+            steps {
+                echo '🚀 Desplegando en Kubernetes...'
+                sh 'kubectl apply -f k8s/deployment.yaml'
+                sh 'kubectl apply -f k8s/service.yaml'
             }
         }
     }
 
     post {
         success {
-            echo '✅ Pipeline completado. Imagen exportada.'
+            echo '✅ Despliegue completado correctamente.'
         }
         failure {
             echo '💥 Algo falló en el pipeline.'
