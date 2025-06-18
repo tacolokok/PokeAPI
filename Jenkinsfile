@@ -2,62 +2,47 @@ pipeline {
     agent any
 
     tools {
-        nodejs "node-js"  // Asegúrate que este nombre es el del NodeJS en Jenkins
+        nodejs "node-js"
     }
 
     stages {
         stage('Preparar entorno') {
             steps {
                 dir('reactasir') {
-                    echo '🧹 Limpiando y preparando dependencias...'
-                    sh '''
-                        rm -rf node_modules package-lock.json
-                        npm cache clean --force || true
-                        npm install
-                    '''
+                    sh 'npm install'
                 }
             }
         }
 
-        stage('Test') {
+        stage('Build frontend') {
             steps {
                 dir('reactasir') {
-                    echo '🧪 Ejecutando pruebas...'
-                    sh 'npm test || echo "❗ Sin tests definidos o fallaron (ignorado por ahora)"'
-                }
-            }
-        }
-
-        stage('Build') {
-            steps {
-                dir('reactasir') {
-                    echo '🛠️ Compilando la app...'
                     sh 'npm run build'
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Construir imagen Docker') {
             steps {
-                echo '🚀 Desplegando en Kubernetes...'
-                sh '''
-                    kubectl delete configmap pokeapp-static --ignore-not-found
-                    kubectl create configmap pokeapp-static --from-file=reactasir/dist --dry-run=client -o yaml | kubectl apply -f -
-                    kubectl apply -f k8s/deployment.yaml
-                '''
+                dir('reactasir') {
+                    sh 'docker build -t pokeapp:latest .'
+                }
             }
         }
 
-        stage('Finalizado') {
+        stage('Desplegar en Kubernetes') {
             steps {
-                echo '🎉 Pipeline completado correctamente.'
+                sh 'kubectl apply -f k8s/deployment.yaml'
             }
         }
     }
 
     post {
+        success {
+            echo '✅ Despliegue completado correctamente.'
+        }
         failure {
-            echo '💥 El pipeline ha fallado.'
+            echo '💥 Algo falló en el pipeline.'
         }
     }
 }
