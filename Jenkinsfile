@@ -7,13 +7,14 @@ pipeline {
         IMPORT_SCRIPT = '/usr/local/bin/importar_imagen_k3s.sh'
     }
 
-    stages {
-        stage('Preparar entorno') {
-            steps {
-                echo '🧹 Preparando entorno...'
-                sh 'ls -la'
-            }
-        }
+    stage('Importar imagen en k3s') {
+    steps {
+        echo '📦 Importando imagen en k3s...'
+        // Esta es la línea que debes usar
+        sh "ssh root@localhost 'k3s ctr images import /root/imagen.tar'"
+    }
+}
+
 
         stage('Construir imagen Docker') {
             steps {
