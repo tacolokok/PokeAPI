@@ -31,7 +31,7 @@ pipeline {
         stage('Importar en K3s') {
             steps {
                 echo '📦 Importando imagen a K3s directamente (sin SSH)...'
-                sh "sh 'sudo /usr/local/bin/k3s ctr images import imagen.tar'"
+                sh 'sudo /usr/local/bin/k3s ctr images import imagen.tar'
             }
         }
 
