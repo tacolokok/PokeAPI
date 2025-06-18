@@ -42,7 +42,7 @@ pipeline {
                 echo '🚀 Desplegando en Kubernetes...'
                 sh '''
                     kubectl delete configmap pokeapp-static --ignore-not-found
-                    kubectl create configmap pokeapp-static --from-file=reactasir/build --dry-run=client -o yaml | kubectl apply -f -
+                    kubectl create configmap pokeapp-static --from-file=reactasir/dist --dry-run=client -o yaml | kubectl apply -f -
                     kubectl apply -f k8s/deployment.yaml
                 '''
             }
