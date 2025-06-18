@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "proyecto:latest"
+        DOCKER_IMAGE = 'proyecto:latest'
+        TAR_FILE = 'imagen.tar'
     }
 
     stages {
@@ -16,32 +17,35 @@ pipeline {
         stage('Construir imagen Docker') {
             steps {
                 echo '🐳 Construyendo imagen Docker...'
-                sh "docker build -t $IMAGE_NAME ."
+                sh "docker build -t ${DOCKER_IMAGE} ."
             }
         }
 
-        stage('Importar imagen a k3s') {
+        stage('Exportar imagen a TAR') {
             steps {
-                echo '📦 Importando imagen en k3s...'
-                sh "docker save $IMAGE_NAME -o imagen.tar"
-                sh "k3s ctr images import imagen.tar"
+                echo '📦 Exportando imagen a archivo TAR...'
+                sh "docker save ${DOCKER_IMAGE} -o ${TAR_FILE}"
             }
         }
 
-        stage('Desplegar en Kubernetes') {
+        // No ejecutamos k3s ctr images import porque no está disponible en Jenkins
+        // Lo haces tú desde el host manualmente
+
+        stage('Aviso') {
             steps {
-                echo '🚀 Reiniciando despliegue en Kubernetes...'
-                sh "kubectl rollout restart deployment proyecto"
+                echo '⚠️  IMPORTANTE: Ejecuta manualmente desde el host:'
+                echo '    k3s ctr images import /ruta/al/imagen.tar'
+                echo '    kubectl rollout restart deployment proyecto'
             }
         }
     }
 
     post {
-        failure {
-            echo "💥 Algo falló en el pipeline."
-        }
         success {
-            echo "✅ Despliegue completado correctamente."
+            echo '✅ Pipeline completado. Imagen exportada.'
+        }
+        failure {
+            echo '💥 Algo falló en el pipeline.'
         }
     }
 }
