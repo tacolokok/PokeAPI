@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'proyecto:latest'
         IMAGE_TAR = 'imagen.tar'
-        K3S_PATH = '/usr/local/bin/k3s'  // Asegúrate que es la ruta correcta con `which k3s`
+        IMPORT_SCRIPT = '/usr/local/bin/importar_imagen_k3s.sh'
     }
 
     stages {
@@ -32,7 +32,7 @@ pipeline {
         stage('Importar imagen en k3s') {
             steps {
                 echo '📦 Importando imagen en k3s...'
-                sh "${K3S_PATH} ctr images import ${IMAGE_TAR}"
+                sh "${IMPORT_SCRIPT}"
             }
         }
 
