@@ -30,16 +30,16 @@ pipeline {
 
         stage('Importar en K3s') {
             steps {
-                echo '📦 Importando imagen a K3s directamente (sin SSH)...'
-                sh '/usr/local/bin/k3s ctr images import imagen.tar'
+                echo '📦 Importando imagen a K3s mediante SSH...'
+                sh 'ssh root@localhost "/usr/local/bin/k3s ctr images import /root/PokeAPI/imagen.tar"'
             }
         }
 
         stage('Desplegar en Kubernetes') {
             steps {
-                echo '🚀 Aplicando manifiestos...'
-                sh 'kubectl apply -f k8s/deployment.yaml'
-                sh 'kubectl apply -f k8s/service.yaml'
+                echo '🚀 Desplegando en Kubernetes...'
+                sh 'ssh root@localhost "kubectl apply -f /root/PokeAPI/k8s/deployment.yaml"'
+                sh 'ssh root@localhost "kubectl apply -f /root/PokeAPI/k8s/service.yaml"'
             }
         }
     }
