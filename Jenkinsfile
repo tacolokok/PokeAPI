@@ -32,6 +32,9 @@ pipeline {
                 echo '🎉 Pipeline completado correctamente.'
             }
         }
+
+            }
+}
 stage('Deploy') {
     steps {
         echo '🚀 Desplegando en Kubernetes...'
