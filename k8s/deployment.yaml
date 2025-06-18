@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pokeapp-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pokeapp
+  template:
+    metadata:
+      labels:
+        app: pokeapp
+    spec:
+      containers:
+        - name: pokeapp
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: pokeapp-static
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: pokeapp-static
+          configMap:
+            name: pokeapp-static
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pokeapp-service
+spec:
+  type: NodePort  # o ClusterIP, LoadBalancer, según prefieras
+  selector:
+    app: pokeapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080  # Puerto expuesto en el nodo (puedes cambiarlo)
