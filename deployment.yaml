@@ -1,40 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pokeapp
+  name: proyecto
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: pokeapp
+      app: proyecto
   template:
     metadata:
       labels:
-        app: pokeapp
+        app: proyecto
     spec:
       containers:
-        - name: pokeapp
-          image: nginx:alpine
+        - name: proyecto
+          image: proyecto:latest
           ports:
             - containerPort: 80
-          volumeMounts:
-            - name: pokeapp-volume
-              mountPath: /usr/share/nginx/html
-      volumes:
-        - name: pokeapp-volume
-          configMap:
-            name: pokeapp-static
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pokeapp-service
-spec:
-  selector:
-    app: pokeapp
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-  type: ClusterIP
