@@ -32,5 +32,18 @@ pipeline {
                 echo '🎉 Pipeline completado correctamente.'
             }
         }
+stage('Deploy') {
+    steps {
+        echo '🚀 Desplegando en Kubernetes...'
+        sh '''
+            # Copiamos la build al contenedor (si hiciera falta empaquetar, podrías usar Docker)
+            # Creamos un configmap con los archivos estáticos
+            kubectl delete configmap pokeapp-static --ignore-not-found
+            kubectl create configmap pokeapp-static --from-file=build --dry-run=client -o yaml | kubectl apply -f -
+
+            # Aplicamos el manifiesto del deployment
+            kubectl apply -f k8s/deployment.yaml
+        '''
     }
 }
+
