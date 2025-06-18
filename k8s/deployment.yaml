@@ -1,32 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pokeapi
+  name: proyecto
+  namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: pokeapi
+      app: proyecto
   template:
     metadata:
       labels:
-        app: pokeapi
+        app: proyecto
     spec:
       containers:
-      - name: pokeapi
-        image: proyecto:latest
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pokeapi-service
-spec:
-  selector:
-    app: pokeapi
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
-  type: NodePort
+        - name: proyecto
+          image: proyecto:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
