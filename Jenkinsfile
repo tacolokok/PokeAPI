@@ -2,7 +2,11 @@ pipeline {
     agent any
 
     tools {
-        nodejs "node-js"  // Asegúrate de que en Jenkins esté configurado con ese nombre
+        nodejs "node-js" // Asegúrate de que este nombre está bien en Jenkins
+    }
+
+    environment {
+        NODE_ENV = 'production'
     }
 
     stages {
@@ -12,9 +16,7 @@ pipeline {
                 sh '''
                     rm -rf node_modules package-lock.json
                     npm cache clean --force
-                    npm install || npm install --force
-                    npm audit fix || true
-                    npm audit fix --force || true
+                    npm install
                 '''
             }
         }
@@ -23,7 +25,11 @@ pipeline {
             steps {
                 echo '🧪 Ejecutando pruebas...'
                 sh '''
-                    npm test || echo "❗ Sin tests definidos o fallaron (ignorado por ahora)"
+                    if npm test; then
+                        echo "✅ Tests pasaron"
+                    else
+                        echo "❗ Sin tests definidos o fallaron (ignorado por ahora)"
+                    fi
                 '''
             }
         }
