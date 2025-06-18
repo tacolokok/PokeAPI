@@ -32,12 +32,10 @@ pipeline {
         stage('Importar en K3s') {
             steps {
                 echo '📦 Enviando imagen por SCP...'
-                sh 'scp -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no imagen.tar root@62.171.152.253:/tmp/imagen.tar'
-
+                sh 'scp -i ${SSH_KEY} -o StrictHostKeyChecking=no imagen.tar ${REMOTE_USER}@${REMOTE_HOST}:/tmp/imagen.tar'
 
                 echo '📦 Importando imagen a K3s vía SSH...'
-                sh 'ssh -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no root@62.171.152.253 "k3s ctr images import /tmp/imagen.tar"'
-
+                sh 'ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "k3s ctr images import /tmp/imagen.tar"'
             }
         }
 
@@ -45,6 +43,13 @@ pipeline {
             steps {
                 echo '🚀 Desplegando aplicación...'
                 sh 'ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "kubectl apply -f /root/PokeAPI/k8s/deployment.yaml"'
+            }
+        }
+
+        stage('Exponer servicio') {
+            steps {
+                echo '🌐 Exponiendo servicio en Kubernetes...'
+                sh 'ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "kubectl apply -f /root/PokeAPI/k8s/service.yaml"'
             }
         }
     }
