@@ -46,6 +46,13 @@ pipeline {
             }
         }
 
+        stage('Reiniciar deployment') {
+            steps {
+                echo '🔁 Reiniciando deployment para aplicar nueva imagen...'
+                sh 'ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "kubectl rollout restart deployment proyecto"'
+            }
+        }
+
         stage('Exponer servicio') {
             steps {
                 echo '🌐 Exponiendo servicio en Kubernetes...'
