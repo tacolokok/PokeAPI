@@ -1,12 +1,65 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Mi Proyecto</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Despliegue con Jenkins y Kubernetes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>¡Hola mundo desde Jenkins + Kubernetes!</h1>
-  <h2>de puta madre diabolico brr</h2>
-  <h2>esto es un aprobado</h2>
+<body class="bg-gray-100 text-gray-800">
+  <header class="bg-blue-700 text-white py-6 shadow-md">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-3xl font-bold">Automatización con Jenkins & Kubernetes</h1>
+      <p class="text-sm mt-2">Pipeline CI/CD completo con despliegue en K3s</p>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-10">
+    <section class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-semibold mb-4">¿Qué hace esta solución?</h2>
+      <p class="mb-4">Este proyecto integra Jenkins con Kubernetes (K3s) para automatizar el despliegue continuo de una aplicación. Desde el push al repositorio hasta la ejecución en producción, todo está orquestado.</p>
+      <img src="https://www.jenkins.io/images/logos/jenkins/jenkins.png" alt="Logo Jenkins" class="w-40 inline-block mr-4">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Kubernetes_%28container_engine%29.png" alt="Logo Kubernetes" class="w-40 inline-block">
+    </section>
+
+    <section class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-semibold mb-4">Arquitectura del Pipeline</h2>
+      <ul class="list-disc pl-6 space-y-2">
+        <li><strong>GitHub:</strong> Gestión del código fuente.</li>
+        <li><strong>Jenkins:</strong> Construcción de la imagen Docker y despliegue.</li>
+        <li><strong>Docker:</strong> Construcción de contenedores.</li>
+        <li><strong>K3s:</strong> Cluster Kubernetes ligero donde se ejecuta la app.</li>
+      </ul>
+      <div class="mt-4 text-center">
+        <img src="https://miro.medium.com/v2/resize:fit:800/format:webp/1*Ip_EZsb3gRZh1jDZgSnpZg.png" alt="Esquema del pipeline" class="mx-auto rounded-xl shadow-md">
+      </div>
+    </section>
+
+    <section class="bg-white rounded-2xl shadow-lg p-6">
+      <h2 class="text-2xl font-semibold mb-4">Ventajas</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-lg">Automatización total</h3>
+          <p>Desde el push hasta el despliegue, sin intervención manual.</p>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg">Escalabilidad</h3>
+          <p>Gracias a Kubernetes, tu app escala fácilmente.</p>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg">Control de versiones</h3>
+          <p>Cada commit puede generar una imagen trazable y reproducible.</p>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg">Despliegue seguro</h3>
+          <p>Entorno aislado y controlado con namespaces y RBAC.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center text-gray-500 py-6 text-sm">
+    Proyecto realizado por Jero · 2025
+  </footer>
 </body>
 </html>
